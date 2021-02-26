@@ -23,6 +23,10 @@ function init() {
     //github user name
     //email address
 
+    //read & split base template text
+    const baseTemplateText = fs.readFileSync("./data/baseTemplate.txt", "utf8");
+    const readmeSections = baseTemplateText.split("~");
+
     inquirer
   .prompt([
     {
