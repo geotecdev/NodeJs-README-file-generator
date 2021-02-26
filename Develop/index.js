@@ -5,6 +5,9 @@ const fs = require("fs");
 // TODO: Create an array of questions for user input
 const questions = [];
 
+//promptAction ctor
+
+
 // TODO: Create a function to write README file
 function writeToFile(fileName, data) {
 
@@ -76,26 +79,38 @@ function init() {
         name: "email",
       }, 
   ])
-  .then((response) => {
-    console.log("projectTitle");
-    console.log(response.projectTitle);
-    console.log("description");
-    console.log(response.description);
-    console.log("installInstructions");
-    console.log(response.installInstructions);
-    console.log("usageInformation");
-    console.log(response.usageInformation);
-    console.log("contributionInfo");
-    console.log(response.contributionInfo);
-    console.log("testInstructions");
-    console.log(response.testInstructions);
-    console.log("licence");
-    console.log(response.licence);
-    console.log("gitHubUsername");
-    console.log(response.gitHubUsername);
-    console.log("email");
-    console.log(response.email);
-    
+  .then((response) => {    
+    let readmeText = "";
+    readmeText += readmeSections[0].replace("[projectTitle]", response.projectTitle);
+    readmeText += readmeSections[1].replace("[description]", response.description);
+    readmeText += readmeSections[2].replace("[installInstructions]", response.installInstructions);
+    readmeText += readmeSections[3].replace("[usageInformation]", response.usageInformation);
+    readmeText += readmeSections[4].replace("[contributionInfo]", response.contributionInfo);
+    readmeText += readmeSections[5].replace("[testInstructions]", response.testInstructions);
+
+    const licenceChoice = readmeSections[6].replace("[licence]", response.licence);
+    let licenceText = "";
+
+    if (licenceChoice === "Mit") {
+        licenceText = fs.readFileSync("./data/mitLicence.txt", "utf8");
+    }
+    else if (licenceChoice === "Boost") {
+        licenceText = fs.readFileSync("./data/boostLicence.txt", "utf8");
+    }
+    else {
+        licenceText = fs.readFileSync("./data/apacheLicence.txt", "utf8");
+    }
+
+    readmeText += readmeSections[6].replace("licence", licenceText);
+
+    readmeText += readmeSections[7].replace("[gitHubUsername]", response.gitHubUsername);
+    readmeText += readmeSections[8].replace("[email]", response.email);
+
+    //remove base template delimiters
+    readmeText = readmeText.replace("~", "");
+
+    //test output
+    console.log(readmeText);
 
   });
 
