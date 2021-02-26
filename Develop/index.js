@@ -5,22 +5,30 @@ const fs = require("fs");
 // TODO: Create an array of questions for user input
 const questions = [];
 
-//promptAction ctor
-function promptAction(valueName, message) {
-    this.valueName = valueName;
-    this.message = message;
-    //
-    this.execute = function() {
-      inquirer.prompt([{
-        name: this.valueName,
-        type: "input",
-        message: this.message
-      }])
-      .then((answer) => {
-        return answer[this.valueName];
-      });
-    }
-  }
+//promptSession
+function promptSession() {
+  let readmeText = "";
+  let qIndex = 0; // Store the number of wrong answers
+  const askQuestion = () => {
+    inquirer.prompt([{name: "answer", message: "enter a string to add to concat readme Result"}]).then((response) => {
+        readmeText += response.answer + '\r\n';
+      qIndex++;
+      // limit recursion to 10 answers
+      if (qIndex < 10) {
+        // Ask the next question
+        askQuestion ();
+      }
+      else {
+        readmeText += response.answer + '\r\n';
+        console.log(readmeText);
+        return;
+      }
+    });
+  };        
+  askQuestion();                                                                                                            
+}
+
+
 
 // TODO: Create a function to write README file
 function writeToFile(fileName, data) {
@@ -34,23 +42,20 @@ function init() {
     const baseTemplateText = fs.readFileSync("./data/baseTemplate.txt", "utf8");
     const readmeSections = baseTemplateText.split("~");
 
-    const promptActions = [
-        new promptAction("projectTitle", "Enter the title of your application"),
-        new promptAction("description", "Provide a brief description of what the app does")
+    const promptData = [
+        {
+            valueName: "projectTitle",
+            question: "Enter the title of your application"
+        },
+        {
+            valueName: "description",
+            question: "Provide a brief description of what the app does"
+        }
     ];
 
-    for (let i = 0; i < promptActions.length; i++) {
-        process() {
-            
-        }
+    //promptSession(promptData);
 
-        function getPaResult() {
-            let paResult = promptActions[i].execute()
-        }        
-        .then((paResult) => {
-            console.log(paResult);
-        });        
-      }
+    promptSession();
 }
 
 // Function call to initialize app
