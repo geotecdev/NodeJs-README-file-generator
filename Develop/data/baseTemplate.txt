@@ -1,0 +1,37 @@
+# [projectTitle]
+
+~
+[projectDescription]
+
+~
+## Installation Instructions
+
+[installInstructions]
+
+~
+## Usage information
+
+```javascript
+[usageInformation]
+```
+~
+## Contribution Guidelines
+
+[contributionInfo]
+
+~
+## Test instructions
+```javascript
+[testInstructions]
+```
+
+~
+## Licence
+
+[licence]
+~
+## Developer Contact Info
+
+[gitHubUsername]
+~
+[email]
