@@ -9,46 +9,54 @@ function questionData(fieldName, isRequired, questionsSsv, optionsSsv = "") {
     this.questionsSsv = questionsSsv;
     this.optionsSsv = optionsSsv;
   
-    const questions = questionsSsv.split(";");
-    const options = optionsSsv.split(";");
+    this.questions = this.questionsSsv.split(";");
+    if (this.questions === undefined) {
+      this.questions = [];
+    }
+    this.options = this.optionsSsv.split(";");
+    if (this.options === undefined) {
+      this.options = [];
+    }
 }
 
 function matchData(choiceName, pathOrTemplate) {
     this.choiceName = choiceName;
     this.pathOrTemplate =  pathOrTemplate;
-
-
 }
 
 //promptSession
-function promptSession(questionDataList) {
+function promptSession(questionDataList, matchDataList) {
   let readmeText = "";
-  let qIndex = 0;
+  let qDataIndex = 0;
+  let questionIndex = 0;
 
   const askQuestion = () => {
-    let test = "";
-    inquirer.prompt([
-        {
-            name: "answer", 
-            message: "enter a string to add to concat readme Result"
-        }
-    ]).then((response) => {
-        readmeText += response.answer + '\r\n';
-      qIndex++;
-      // limit recursion to 10 answers
-      if (qIndex < 10) {
-        // Ask the next question
-        askQuestion ();
+
+    let qData = questionDataList[qDataIndex];
+
+      inquirer.prompt([
+      {
+          name: "answer", 
+          message: qData.questions[0]
       }
-      else {
-        readmeText += response.answer + '\r\n';
-        console.log(readmeText);
-        return;
-      }
-    });
+      ]).then((response) => {
+          readmeText += response.answer + '\r\n';
+          qDataIndex++;
+          // limit recursion to item count of qdl
+          if (qDataIndex < questionDataList.length) {
+            // Ask the next question
+            askQuestion ();
+          }
+          else {
+            readmeText += response.answer + '\r\n';
+            console.log(readmeText);
+            return;
+          }
+      });
+
   };        
   askQuestion();                                                                                                            
-}
+}    
 
 
 
@@ -60,17 +68,17 @@ function writeToFile(fileName, data) {
 // TODO: Create a function to initialize app
 function init() {
   
-  const questionDataList = [
+  let questionDataList = [
     new questionData("projectTitle", true, "what is your project's title?"),
     new questionData("description", true, "enter a brief description of your application"),
     new questionData("installInstructions", false, "use codeblock (y/n)?;enter installation instructions"),
     new questionData("usageInformation", false, "use codeblock (y/n)?;enter usage information", ""),
     new questionData("contributionInfo", false, "list some guidelines for contribution to the project"),
     new questionData("testInstructions", false, "provide some instructions for testing"),
-    new questionData("licence", false, "choose a licence", "MIT;Boost;Apache"),
+    new questionData("licence", false, "choose a licence", "> MIT;> Boost;> Apache"),
     new questionData("gitHubUsername", true, "what is your username on GitHub?"),
     new questionData("email", true, "what is your email address?")
-  ]
+  ];
 
     //read & split base template text
     const baseTemplateText = fs.readFileSync("./data/baseTemplate.txt", "utf8");
@@ -82,8 +90,19 @@ function init() {
       qData["docSectionText"] = readmeSections[i];
     }
 
+    //create matchData map for special section formatting
+    const matchDataList = [
+      new matchData("> MIT", "./data/mitLicence.txt"),
+      new matchData("> Boost", "./data/boostLicence.txt"),
+      new matchData("> Apache","./data/apacheLicence.txt" )
+    ];
 
-    promptSession(questionDataList);
+    //const session = new promptSession(questionDataList, matchDataList);
+    //console.log(session);
+
+    //session.run();
+
+    promptSession(questionDataList, matchDataList);
 }
 
 // Function call to initialize app
