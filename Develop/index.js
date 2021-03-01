@@ -1,9 +1,15 @@
 // TODO: Include packages needed for this application
 const inquirer = require('inquirer');
 const fs = require("fs");
+let licenceName ="";
+let licenceText = "";
+
 
 // TODO: Create a function to initialize app
 function init() {
+      const sectionNames = ["project-title", "description", "installation-instructions", "usage-information", "contribution-guidelines", "test-instructions", "licence", "developer-contact-info"];
+
+
       //read & split base template text
       const baseTemplateText = fs.readFileSync("./data/baseTemplate.txt", "utf8");
       const readmeSections = baseTemplateText.split("~");
@@ -23,22 +29,22 @@ function init() {
         {
           type: "input",
           message: "enter installation instructions",
-          name: "installInstructions",
+          name: "installation-instructions",
         }, 
         {
           type: "input",
           message: "enter usage information",
-          name: "usageInformation",
+          name: "usage-information",
         }, 
         {
           type: "input",
           message: "list some guidelines for contribution to the project",
-          name: "contributionInfo",
+          name: "contribution-guidelines",
         }, 
         {
           type: "input",
           message: "provide some instructions for testing",
-          name: "testInstructions",
+          name: "test-instructions",
         }, 
         {
           type: "rawlist",
@@ -59,30 +65,40 @@ function init() {
     ])
     .then((response) => {    
       let readmeText = "";
-      readmeText += readmeSections[0].replace("[projectTitle]", response.projectTitle);
-      readmeText += readmeSections[1].replace("[description]", response.description);
-      readmeText += readmeSections[2].replace("[installInstructions]", response.installInstructions);
-      readmeText += readmeSections[3].replace("[usageInformation]", response.usageInformation);
-      readmeText += readmeSections[4].replace("[contributionInfo]", response.contributionInfo);
-      readmeText += readmeSections[5].replace("[testInstructions]", response.testInstructions);
+          
+      readmeText += readmeSections[0].replace("[" + sectionNames[0] + "]", response.projectTitle);
+      readmeText += readmeSections[1].replace("[" + sectionNames[1] + "]", response.description + "\r\n");
+
+      //## Table of Contents for sections under title and description
+      for (let i = 2; i < sectionNames.length; i++) {
+        readmeText += "[" + sectionNames[i] + "](#" + sectionNames[i].toLowerCase() + ")" + "\r\n"; 
+      }
+
+      //create sections down to the licence
+      for (let sectionIndex = 2; sectionIndex < readmeSections.length - 1; sectionIndex++) {
+        readmeText += readmeSections[sectionIndex].replace("[" + sectionNames[sectionIndex] + "]", response[sectionNames[sectionIndex]]);
+      }
   
-      const licenceChoice = readmeSections[6].replace("[licence]", response.licence);
-      let licenceText = "";
+      licenceName = response.licence;
+      console.log(licenceName);
+      console.log(response.licence === "Mit");
+      licenceText = "";
   
-      if (licenceChoice === "Mit") {
+      if (licenceName === "Mit") {
           licenceText = fs.readFileSync("./data/mitLicence.txt", "utf8");
       }
-      else if (licenceChoice === "Boost") {
+      else if (licenceName === "Boost") {
           licenceText = fs.readFileSync("./data/boostLicence.txt", "utf8");
       }
       else {
           licenceText = fs.readFileSync("./data/apacheLicence.txt", "utf8");
       }
+
+      readmeText += readmeSections[6].replace("[" + sectionNames[6] + "]", licenceText);
   
-      readmeText += readmeSections[6].replace("licence", licenceText);
-  
+      //contact section
       readmeText += readmeSections[7].replace("[gitHubUsername]", response.gitHubUsername);
-      readmeText += readmeSections[8].replace("[email]", response.email);
+      readmeText = readmeText.replace("[email]", response.email);
   
       //remove base template delimiters
       readmeText = readmeText.replace("~", "");

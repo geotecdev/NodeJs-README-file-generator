@@ -1,4 +1,4 @@
-# [projectTitle]
+# [project-title]
 
 ~
 [description]
@@ -6,24 +6,23 @@
 ~
 ## Installation Instructions
 
-[installInstructions]
+[installation-instructions]
 
 ~
-## Usage information
+## Usage Information
 
-```javascript
-[usageInformation]
-```
+[usage-information]
+
 ~
 ## Contribution Guidelines
 
-[contributionInfo]
+[contribution-guidelines]
 
 ~
 ## Test instructions
-```javascript
-[testInstructions]
-```
+
+[test-instructions]
+
 
 ~
 ## Licence
@@ -32,6 +31,6 @@
 ~
 ## Developer Contact Info
 
-[gitHubUsername]
-~
+https://github.com/[gitHubUsername]
+
 [email]
